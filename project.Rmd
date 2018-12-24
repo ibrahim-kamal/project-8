@@ -1,0 +1,145 @@
+---
+title: "project 8"
+output: html_document
+author: "Ebrahim kamal"
+---
+#Introduction
+  Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
+
+#Data
+Data
+
+The training data for this project are available here:
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data are available here:
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+The data for this project come from this source: http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment.
+
+#load library
+```{r,eval=FALSE}
+  library(caret)
+```
+
+# read train and test data
+```{r,eval=FALSE}
+  training <- read.csv('C:/Users/ibrahim/Desktop/P8 week 4/pml-training.csv')
+  testing  <- read.csv('C:/Users/ibrahim/Desktop/P8 week 4/pml-testing.csv')
+```
+
+
+#clean data
+```{r,eval=FALSE}
+# remove first column 
+training <- training[c(2:160)]
+# get columns name and save it in colsNames var
+ColsNames <- names(training)
+# number of rows
+lenCol = 19622
+# start count 
+count = 1
+for (colName in ColsNames) {
+  # get the col with name 
+  currentCol = training[colName]
+  currentCol = currentCol[[colName]]
+  # get number NAs Value in column [1]
+  lenNA   = length(subset(currentCol , is.na(currentCol)))
+  # check is type of col is factor
+  if(is.factor(currentCol)){
+    # convert type from factor to str 
+    colAsStr <- as.character(currentCol)
+    #get number empty Value in column [2]
+    lenSpace <- length(subset(colAsStr , colAsStr == ""))
+    # sum [1] and [2]
+    lenNA = lenNA + lenSpace  
+  }
+  #check if number of rows is bigger than 30% that has empty or NA value 
+  if(((lenNA / lenCol) * 100) < 30)
+  {
+    # check is not str
+    if(!is.character(currentCol)){
+        #check is newTraining 
+        if(exists('newTraining'))
+        {
+          # save col name in colN(list) 
+          colN[count] = colName
+          # add new col in data frame
+          newTraining <- cbind(newTraining , new = currentCol)  
+        }
+        else
+        {
+          # save col name in colN(list) 
+          colN = colName
+          # create data frame
+          newTraining <- data.frame(new = currentCol)
+        }
+        # name data frame cols  
+        colnames(newTraining) <- colN
+        # increase count
+        count = count + 1
+    }
+  }
+}
+
+```
+
+#split train data
+```{r,eval=FALSE}
+# split data into two variable (trainSet , testSet)
+intrain <- createDataPartition(newTraining$classe , p= 0.6,list = T)
+trainSet <- newTraining[intrain[[1]],]
+testSet <- newTraining[-intrain[[1]],]
+```
+
+#prepare testset
+```{r,eval=FALSE}
+newTesting <- testing[colnames(newTraining)[1:(dim(newTraining)[2] - 1)]]
+```
+
+#training
+```{r,eval=FALSE}
+mod_1  = train(classe ~ . , mathod = 'rf',data = trainSet)
+pred_1 = predict(mod_1,testSet)
+mod_2  = train(classe ~ . , mathod = 'glm',data = trainSet)
+pred_2 = predict(mod_2,testSet)
+mod_3  = train(classe ~ . , mathod = 'gam',data = trainSet)
+pred_3 = predict(mod_3,testSet)
+all_pred <- data.frame(pred1 = pred_1,pred2 = pred_2,pred3 = pred_3)
+pred_All = predict(all_pred,newTesting)
+```
+
+#Accuracy
+```{r,eval=FALSE}
+# get rf accuracy
+acc_1 <- (table(pred_1 == testSet)[2]/length(pred_1))[[1]]
+# get glm accuracy
+acc_2 <- (table(pred_2 == testSet)[2]/length(pred_1))[[1]]
+# get gam accuracy
+acc_3 <- (table(pred_3 == testSet)[2]/length(pred_1))[[1]]
+# get combine classification accuracy
+acc_All <- (table(pred_All == testSet)[2]/length(pred_1))[[1]]
+```
+
+#get class for test dataSet
+
+```{r,eval=FALSE}
+#select the big accuracy and use it to predict class
+if(acc_1 > acc_2 && acc_1 > acc_3 && acc_1 > acc_All){
+  predict(mod_1,testing)
+}
+else if(acc_2 > acc_3 && acc_2 > acc_All){
+  predict(mod_2,testing)
+}
+else if(acc_3 > acc_All){
+  predict(mod_3,testing)
+}
+else{
+  predict(mod_All,testing)
+}
+```
+
+
+
