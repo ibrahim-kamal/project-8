@@ -59,13 +59,10 @@ acc_All <- (table(as.character(pred_All) == as.character(testSet$classe))[2]/len
 #select the big accuracy and use it to predict class
 if(acc_1 > acc_2 && acc_1 > acc_3 && acc_1 > acc_All){
   predict(mod_1,testing)
-}
-elseif(acc_2 > acc_3 && acc_2 > acc_All){
+}else if(acc_2 > acc_3 && acc_2 > acc_All){
   predict(mod_2,testing)
-}
-else if(acc_3 > acc_All){
+}else if(acc_3 > acc_All){
   predict(mod_3,testing)
-}
-else{
+}else{
   predict(mod_All,testing)
 }
