@@ -1,5 +1,5 @@
 ---
-title: "project 8"
+title: "Project Prediction"
 output: html_document
 author: "Ebrahim kamal"
 ---
@@ -107,8 +107,6 @@ mod_2  = train(classe ~ . , mathod = 'glm',data = trainSet)
 pred_2 = predict(mod_2,testSet)
 mod_3  = train(classe ~ . , mathod = 'gam',data = trainSet)
 pred_3 = predict(mod_3,testSet)
-all_pred <- data.frame(pred1 = pred_1,pred2 = pred_2,pred3 = pred_3)
-pred_All = predict(all_pred,newTesting)
 ```
 
 #Accuracy
@@ -119,8 +117,30 @@ acc_1 <- (table(as.character(pred_1) == as.character(testSet$classe))[2]/length(
 acc_2 <- (table(as.character(pred_2) == as.character(testSet$classe))[2]/length(as.character(pred_1)))[[1]]
 # get gam accuracy
 acc_3 <- (table(as.character(pred_3) == as.character(testSet$classe))[2]/length(as.character(pred_1)))[[1]]
-# get combine classification accuracy
-acc_All <- (table(as.character(pred_All) == as.character(testSet$classe))[2]/length(as.character(pred_1)))[[1]]
+```
+
+#print Accuracy
+```{r,eval=F}
+  print(acc_1)
+```
+```{}
+  # [1] 0.9987255
+```
+
+
+```{r,eval=F}
+  print(acc_2)
+```
+```{}
+  # [1] 0.9991078
+```
+
+
+```{r,eval=F}
+  print(acc_3)
+```
+```{}
+  # [1] 0.9992353
 ```
 
 #get class for test dataSet
@@ -131,12 +151,13 @@ if(acc_1 > acc_2 && acc_1 > acc_3 && acc_1 > acc_All){
   predict(mod_1,testing)
 }else if(acc_2 > acc_3 && acc_2 > acc_All){
   predict(mod_2,testing)
-}else if(acc_3 > acc_All){
-  predict(mod_3,testing)
 }else{
-  predict(mod_All,testing)
+  predict(mod_3,testing)
 }
 ```
-
+```{}
+ [1] B A B A A E D B A A B C B A E E A B B B
+Levels: A B C D E
+```
 
 
