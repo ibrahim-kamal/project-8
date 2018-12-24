@@ -114,13 +114,13 @@ pred_All = predict(all_pred,newTesting)
 #Accuracy
 ```{r,eval=FALSE}
 # get rf accuracy
-acc_1 <- (table(pred_1 == testSet)[2]/length(pred_1))[[1]]
+acc_1 <- (table(as.character(pred_1) == as.character(testSet$classe))[2]/length(as.character(pred_1)))[[1]]
 # get glm accuracy
-acc_2 <- (table(pred_2 == testSet)[2]/length(pred_1))[[1]]
+acc_2 <- (table(as.character(pred_2) == as.character(testSet$classe))[2]/length(as.character(pred_1)))[[1]]
 # get gam accuracy
-acc_3 <- (table(pred_3 == testSet)[2]/length(pred_1))[[1]]
+acc_3 <- (table(as.character(pred_3) == as.character(testSet$classe))[2]/length(as.character(pred_1)))[[1]]
 # get combine classification accuracy
-acc_All <- (table(pred_All == testSet)[2]/length(pred_1))[[1]]
+acc_All <- (table(as.character(pred_All) == as.character(testSet$classe))[2]/length(as.character(pred_1)))[[1]]
 ```
 
 #get class for test dataSet
